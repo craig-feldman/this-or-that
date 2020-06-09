@@ -12,67 +12,40 @@ import {
   CardActions,
   Button,
   makeStyles,
+  Snackbar,
 } from "@material-ui/core";
 import { db } from "./firebase";
 import {
   getDocumentsFromFirestoreViaPath,
   FirebaseDocument,
+  incrementValue,
 } from "./firebase-utils";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import Alert from "@material-ui/lab/Alert";
 
-// const itemsTest: [Item, Item][] = [
-//   [
-//     { value: "Test this", votes: 0 },
-//     { value: "Test that", votes: 0 },
-//   ],
-
-//   [
-//     { value: "Second test this", votes: 5 },
-//     { value: "Second Test that", votes: 1 },
-//   ],
-// ];
-
-type ThisAndThatPair = { this: Item; that: Item } & FirebaseDocument;
-
-const fetchItems = async () => {
-  const snapshot = await db.collection("items").get();
-  snapshot.forEach((doc) => console.log(doc.id, " => ", doc.data()));
-};
+type ThisAndThatPair = {
+  this: Item;
+  that: Item;
+  title: string;
+} & FirebaseDocument;
 
 function App() {
-  const [items, setItems] = useState<ThisAndThatPair[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const [items, loading, error] = useCollectionData<ThisAndThatPair>(
+    db.collection("items"),
+    {
+      idField: "id",
+    }
+  );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsError(false);
-      setIsLoading(true);
-
-      try {
-        const result = await getDocumentsFromFirestoreViaPath<ThisAndThatPair>(
-          "items"
-        );
-        console.log({ result });
-
-        setItems(result);
-      } catch (error) {
-        setIsError(true);
-      }
-
-      setIsLoading(false);
-    };
-
-    fetchData();
-  }, []);
   return (
     <>
       <CssBaseline />
 
       <Container maxWidth="md">
         <Typography variant="h1">This or That </Typography>
-        {isError && <div>Something went wrong ...</div>}
-
-        {isLoading ? <div>Loading ...</div> : <ThisOrThatList items={items} />}
+        {error && <div>Something went wrong ...</div>}
+        {loading && <div>Loading ...</div>}
+        {items && <ThisOrThatList items={items} />}
       </Container>
     </>
   );
@@ -82,9 +55,11 @@ type ThisOrThatListProps = {
   items: ThisAndThatPair[];
 };
 const ThisOrThatList = (props: ThisOrThatListProps) => {
-  const resultList = props.items.map((item, key) => (
-    <div key={key}>
-      <ThisOrThat key={key} thisItem={item.this} thatItem={item.that} />
+  console.log("Rendering this or that list");
+  const resultList = props.items.map((item) => (
+    <div key={item.id}>
+      <Typography variant="h4">{item.title}</Typography>
+      <ThisOrThat thisAndThatPair={item} />
     </div>
   ));
 
@@ -106,45 +81,83 @@ type Item = {
 } & FirebaseDocument;
 
 type ThisOrThatProps = {
-  thisItem: Item;
-  thatItem: Item;
+  thisAndThatPair: ThisAndThatPair;
 };
 const ThisOrThat = (props: ThisOrThatProps) => {
   const classes = useStyles();
-  const { thisItem, thatItem } = props;
+  const { thisAndThatPair } = props;
+
+  console.log("rendering this or that");
 
   return (
     <>
       <Grid container>
         <Grid item xs component={Card} className={classes.card}>
-          <CardHeader title={"This"} />
-          <ItemCardContent item={thisItem} />
+          <ItemCardContent
+            item={thisAndThatPair.this}
+            id={thisAndThatPair.id}
+            type="this"
+          />
         </Grid>
         <Grid item xs component={Card} className={classes.card}>
-          <CardHeader title={"That"}></CardHeader>
-          <ItemCardContent item={thatItem} />
+          <ItemCardContent
+            item={thisAndThatPair.that}
+            id={thisAndThatPair.id}
+            type="that"
+          />
         </Grid>
       </Grid>
     </>
   );
 };
-type ItemCardContentProps = { item: Item };
+
+type ItemCardContentProps = { item: Item; id: string; type: "this" | "that" };
 const ItemCardContent = (props: ItemCardContentProps) => {
-  const [voteCount, setVoteCount] = useState(props.item.votes);
+  const [showVoteSuccessAlert, setShowVoteSuccessAlert] = useState(false);
+  const [showVoteErrorAlert, setShowVoteErrorAlert] = useState(false);
+
+  const voteForItem = async () => {
+    try {
+      await incrementValue("items", props.id, props.type);
+      setShowVoteSuccessAlert(true);
+    } catch (error) {
+      setShowVoteErrorAlert(true);
+    }
+  };
 
   return (
     <>
+      <Snackbar
+        open={showVoteSuccessAlert}
+        autoHideDuration={6000}
+        onClose={() => setShowVoteSuccessAlert(false)}
+      >
+        <Alert
+          onClose={() => setShowVoteSuccessAlert(false)}
+          severity="success"
+        >
+          You voted for {props.type === "this" ? `'THIS'` : `'THAT'`}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={showVoteErrorAlert}
+        autoHideDuration={6000}
+        onClose={() => setShowVoteErrorAlert(false)}
+      >
+        <Alert onClose={() => setShowVoteErrorAlert(false)} severity="error">
+          Whoops. Looks like there was an error while voting.
+        </Alert>
+      </Snackbar>
+
+      <CardHeader title={props.type === "this" ? "This" : "That"} />
       <CardContent>
         {props.item.value}
-        {voteCount}
+        {props.item.votes}
       </CardContent>
       <CardActions>
-        <Button
-          size="small"
-          color="primary"
-          onClick={() => setVoteCount(voteCount + 1)}
-        >
-          +1
+        <Button size="small" color="primary" onClick={voteForItem}>
+          Vote
         </Button>
       </CardActions>
     </>

@@ -1,7 +1,21 @@
 import { db } from "./firebase";
+import firebase from "firebase";
 
 export type FirebaseDocument = {
   id: string;
+};
+
+const increment = firebase.firestore.FieldValue.increment(1);
+
+const incrementValue = (
+  collectionPath: string,
+  documentPath: string,
+  thisOrThat: "this" | "that"
+) => {
+  const ref = db.collection(collectionPath).doc(documentPath);
+  return thisOrThat === "this"
+    ? ref.update({ "this.votes": increment })
+    : ref.update({ "that.votes": increment });
 };
 
 const constructFromQuerySnapshot = <T extends FirebaseDocument>(
@@ -34,4 +48,4 @@ const getDocumentsFromFirestoreViaPath = async <T extends FirebaseDocument>(
   return constructFromQuerySnapshot<T>(querySnapshot);
 };
 
-export { getDocumentsFromFirestoreViaPath };
+export { getDocumentsFromFirestoreViaPath, incrementValue };
