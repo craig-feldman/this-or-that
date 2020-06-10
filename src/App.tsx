@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import logo from "./logo.svg";
+import React, { useState } from "react";
 import "./App.css";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {
@@ -20,20 +19,18 @@ import {
   ThemeProvider,
   Divider,
 } from "@material-ui/core";
-import { db } from "./firebase";
-import {
-  getDocumentsFromFirestoreViaPath,
-  FirebaseDocument,
-  incrementValue,
-} from "./firebase-utils";
+import { db, serverTimestamp } from "./firebase";
+import { FirebaseDocument, incrementValue } from "./firebase-utils";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import Alert from "@material-ui/lab/Alert";
 import AddIcon from "@material-ui/icons/AddCircleOutline";
+import { useForm } from "react-hook-form";
 
 type ThisAndThatPair = {
   this: Item;
   that: Item;
   title: string;
+  createdAt: firebase.firestore.FieldValue;
 } & FirebaseDocument;
 
 const useStylesApp = makeStyles((theme) => ({
@@ -53,7 +50,7 @@ function App() {
   const [showAdd, setShowAdd] = useState(false);
 
   const [items, loading, error] = useCollectionData<ThisAndThatPair>(
-    db.collection("items"),
+    db.collection("items").orderBy("createdAt", "desc"),
     {
       idField: "id",
     }
@@ -102,72 +99,145 @@ const useStylesAdd = makeStyles((theme) => ({
   },
 }));
 
+type FormData = {
+  this: string;
+  that: string;
+  title: string;
+};
+
 type AddThisOrThatProps = {
   setShowAdd: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const AddThisOrThat = (props: AddThisOrThatProps) => {
   const classes = useStylesAdd();
+  const { register, handleSubmit, errors } = useForm<FormData>();
+  const [showSubmitSuccessAlert, setShowSubmitSuccessAlert] = useState(false);
+  const [showSubmitErrorAlert, setShowSubmitErrorAlert] = useState(false);
+
+  const onSubmit = async (data: FormData) => {
+    console.log({ data });
+    try {
+      const newThisAndThatPair: Omit<
+        ThisAndThatPair,
+        keyof FirebaseDocument
+      > = {
+        this: { votes: 0, value: data.this },
+        that: { votes: 0, value: data.that },
+        title: data.title,
+        createdAt: serverTimestamp(),
+      };
+      await db.collection("items").add(newThisAndThatPair);
+      setShowSubmitSuccessAlert(true);
+    } catch (error) {
+      console.error("An error occurred while submitting the data.", error);
+      setShowSubmitErrorAlert(true);
+    }
+  };
 
   return (
-    <Box marginY={2}>
-      <Card>
-        <CardHeader
-          title="Add"
-          subheader="Add a 'this or that item' to let the community vote on it!"
-        />
-        <CardContent>
-          <form noValidate autoComplete="off">
-            <Grid container spacing={4} alignItems="center">
-              <Grid item xs={12}>
-                <TextField
-                  id="add-title"
-                  name="title"
-                  label="Post title"
-                  variant="outlined"
-                  fullWidth
-                  inputProps={{ style: { textAlign: "center" } }}
-                  // InputLabelProps={{
-                  //   style: { textAlign: "center" },
-                  // }}
-                />
+    <>
+      <Snackbar
+        open={showSubmitSuccessAlert}
+        autoHideDuration={6000}
+        onClose={() => setShowSubmitSuccessAlert(false)}
+      >
+        <Alert
+          onClose={() => setShowSubmitSuccessAlert(false)}
+          severity="success"
+        >
+          Successfully submitted.
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={showSubmitErrorAlert}
+        autoHideDuration={6000}
+        onClose={() => setShowSubmitErrorAlert(false)}
+      >
+        <Alert onClose={() => setShowSubmitErrorAlert(false)} severity="error">
+          Whoops. Looks like there was an error while submitting.
+        </Alert>
+      </Snackbar>
+      <Box marginY={2}>
+        <Card>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <CardHeader
+              title="Add"
+              subheader="Add a 'this or that item' to let the community vote on it!"
+            />
+            <CardContent>
+              <Grid container spacing={4} alignItems="center">
+                <Grid item xs={12}>
+                  <TextField
+                    inputRef={register({ required: true })}
+                    id="add-title"
+                    name="title"
+                    label="Post title"
+                    variant="outlined"
+                    fullWidth
+                    inputProps={{ style: { textAlign: "center" } }}
+                    error={!!errors.title}
+                    helperText={
+                      errors.title && "Please enter a title for the post."
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    inputRef={register({ required: true })}
+                    id="add-this"
+                    name="this"
+                    label="this"
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.this}
+                    helperText={
+                      errors.this && "Please enter your first option."
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2}>
+                  <Typography variant="h5"> VS </Typography>
+                </Grid>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    inputRef={register({ required: true })}
+                    id="add-that"
+                    name="that"
+                    label="that"
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.that}
+                    helperText={
+                      errors.that && "Please enter your second option."
+                    }
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  id="add-this"
-                  name="this"
-                  label="this"
-                  variant="outlined"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} sm={2}>
-                <Typography variant="h5"> VS </Typography>
-              </Grid>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  id="add-that"
-                  name="that"
-                  label="that"
-                  variant="outlined"
-                  fullWidth
-                />
-              </Grid>
-            </Grid>
+            </CardContent>
+            <Divider />
+            <CardActions>
+              <Box
+                justifyContent="center"
+                width="100%"
+                className={classes.buttons}
+              >
+                <Button type="submit" variant="contained" color="primary">
+                  Submit
+                </Button>
+                <Button
+                  // type="reset"
+                  variant="contained"
+                  onClick={() => props.setShowAdd(false)}
+                >
+                  Cancel
+                </Button>
+              </Box>
+            </CardActions>
           </form>
-        </CardContent>
-        <Divider />
-        <CardActions>
-          <Box justifyContent="center" width="100%" className={classes.buttons}>
-            <Button variant="contained" color="primary">
-              Submit
-            </Button>
-            <Button variant="contained" onClick={() => props.setShowAdd(false)}>
-              Cancel
-            </Button>
-          </Box>
-        </CardActions>
-      </Card>
-    </Box>
+        </Card>
+      </Box>
+    </>
   );
 };
 
@@ -198,7 +268,7 @@ const useStyles = makeStyles({
 type Item = {
   value: string | JSX.Element;
   votes: number;
-} & FirebaseDocument;
+};
 
 type ThisOrThatProps = {
   thisAndThatPair: ThisAndThatPair;
