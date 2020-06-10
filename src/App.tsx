@@ -13,6 +13,12 @@ import {
   Button,
   makeStyles,
   Snackbar,
+  Fab,
+  TextField,
+  Box,
+  createMuiTheme,
+  ThemeProvider,
+  Divider,
 } from "@material-ui/core";
 import { db } from "./firebase";
 import {
@@ -22,6 +28,7 @@ import {
 } from "./firebase-utils";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import Alert from "@material-ui/lab/Alert";
+import AddIcon from "@material-ui/icons/AddCircleOutline";
 
 type ThisAndThatPair = {
   this: Item;
@@ -29,7 +36,22 @@ type ThisAndThatPair = {
   title: string;
 } & FirebaseDocument;
 
+const useStylesApp = makeStyles((theme) => ({
+  root: {
+    "& > *": {
+      margin: theme.spacing(1),
+    },
+  },
+  extendedIcon: {
+    marginRight: theme.spacing(1),
+  },
+}));
+
 function App() {
+  const classes = useStylesApp();
+
+  const [showAdd, setShowAdd] = useState(false);
+
   const [items, loading, error] = useCollectionData<ThisAndThatPair>(
     db.collection("items"),
     {
@@ -37,19 +59,117 @@ function App() {
     }
   );
 
+  const themeLight = createMuiTheme({
+    palette: {
+      background: {
+        // paper: "#1e88e5",
+      },
+    },
+  });
+
   return (
     <>
-      <CssBaseline />
+      <ThemeProvider theme={themeLight}>
+        <CssBaseline />
 
-      <Container maxWidth="md">
-        <Typography variant="h1">This or That </Typography>
-        {error && <div>Something went wrong ...</div>}
-        {loading && <div>Loading ...</div>}
-        {items && <ThisOrThatList items={items} />}
-      </Container>
+        <Container maxWidth="md">
+          <Box textAlign="center">
+            <Typography variant="h1">This or That </Typography>
+            <Fab
+              variant="extended"
+              color="primary"
+              onClick={() => setShowAdd(true)}
+            >
+              <AddIcon className={classes.extendedIcon} />
+              Add This Or That
+            </Fab>
+            {showAdd && <AddThisOrThat setShowAdd={setShowAdd} />}
+            {error && <div>Something went wrong ...</div>}
+            {loading && <div>Loading ...</div>}
+            {items && <ThisOrThatList items={items} />}
+          </Box>
+        </Container>
+      </ThemeProvider>
     </>
   );
 }
+
+const useStylesAdd = makeStyles((theme) => ({
+  buttons: {
+    "& > *": {
+      margin: theme.spacing(1),
+    },
+  },
+}));
+
+type AddThisOrThatProps = {
+  setShowAdd: React.Dispatch<React.SetStateAction<boolean>>;
+};
+const AddThisOrThat = (props: AddThisOrThatProps) => {
+  const classes = useStylesAdd();
+
+  return (
+    <Box marginY={2}>
+      <Card>
+        <CardHeader
+          title="Add"
+          subheader="Add a 'this or that item' to let the community vote on it!"
+        />
+        <CardContent>
+          <form noValidate autoComplete="off">
+            <Grid container spacing={4} alignItems="center">
+              <Grid item xs={12}>
+                <TextField
+                  id="add-title"
+                  name="title"
+                  label="Post title"
+                  variant="outlined"
+                  fullWidth
+                  inputProps={{ style: { textAlign: "center" } }}
+                  // InputLabelProps={{
+                  //   style: { textAlign: "center" },
+                  // }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={5}>
+                <TextField
+                  id="add-this"
+                  name="this"
+                  label="this"
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} sm={2}>
+                <Typography variant="h5"> VS </Typography>
+              </Grid>
+              <Grid item xs={12} sm={5}>
+                <TextField
+                  id="add-that"
+                  name="that"
+                  label="that"
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+            </Grid>
+          </form>
+        </CardContent>
+        <Divider />
+        <CardActions>
+          <Box justifyContent="center" width="100%" className={classes.buttons}>
+            <Button variant="contained" color="primary">
+              Submit
+            </Button>
+            <Button variant="contained" onClick={() => props.setShowAdd(false)}>
+              Cancel
+            </Button>
+          </Box>
+        </CardActions>
+      </Card>
+    </Box>
+  );
+};
 
 type ThisOrThatListProps = {
   items: ThisAndThatPair[];
@@ -57,13 +177,13 @@ type ThisOrThatListProps = {
 const ThisOrThatList = (props: ThisOrThatListProps) => {
   console.log("Rendering this or that list");
   const resultList = props.items.map((item) => (
-    <div key={item.id}>
+    <Box key={item.id} marginY={4}>
       <Typography variant="h4">{item.title}</Typography>
       <ThisOrThat thisAndThatPair={item} />
-    </div>
+    </Box>
   ));
 
-  return <>{resultList}</>;
+  return <Box marginY={4}>{resultList}</Box>;
 };
 
 const useStyles = makeStyles({
