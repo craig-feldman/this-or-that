@@ -18,13 +18,32 @@ import {
   createMuiTheme,
   ThemeProvider,
   Divider,
+  Tooltip,
+  Fade,
+  Zoom,
+  useTheme,
+  Paper,
 } from "@material-ui/core";
 import { db, serverTimestamp } from "./firebase";
 import { FirebaseDocument, incrementValue } from "./firebase-utils";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import Alert from "@material-ui/lab/Alert";
-import AddIcon from "@material-ui/icons/AddCircleOutline";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import Skeleton from "@material-ui/lab/Skeleton";
+
 import { useForm } from "react-hook-form";
+
+// items={[
+//   {
+//     that: { votes: 0, value: "ABC" },
+//     this: { votes: 0, value: "ABC" },
+//     title: "ABC",
+//     createdAt: serverTimestamp(),
+//     id: "ABC",
+//   },
+// ]}
 
 type ThisAndThatPair = {
   this: Item;
@@ -56,13 +75,23 @@ function App() {
     }
   );
 
-  const themeLight = createMuiTheme({
-    palette: {
-      background: {
-        // paper: "#1e88e5",
-      },
-    },
-  });
+  const LoadingSkeleton = () => {
+    return (
+      <Box marginTop={4}>
+        <Typography variant="h5" align="center">
+          <Skeleton />
+        </Typography>
+        <Grid container spacing={4}>
+          <Grid item xs>
+            <Skeleton height={200} variant={"rect"} />
+          </Grid>
+          <Grid item xs>
+            <Skeleton height={200} variant={"rect"} />
+          </Grid>
+        </Grid>
+      </Box>
+    );
+  };
 
   return (
     <>
@@ -71,19 +100,66 @@ function App() {
 
         <Container maxWidth="md">
           <Box textAlign="center">
-            <Typography variant="h1">This or That </Typography>
-            <Fab
-              variant="extended"
-              color="primary"
-              onClick={() => setShowAdd(true)}
-            >
-              <AddIcon className={classes.extendedIcon} />
-              Add This Or That
-            </Fab>
-            {showAdd && <AddThisOrThat setShowAdd={setShowAdd} />}
-            {error && <div>Something went wrong ...</div>}
-            {loading && <div>Loading ...</div>}
-            {items && <ThisOrThatList items={items} />}
+            <Box marginY={4}>
+              <Typography variant="h1">
+                <Typography display="inline" variant="inherit" color="primary">
+                  This
+                </Typography>{" "}
+                or{" "}
+                <Typography
+                  display="inline"
+                  variant="inherit"
+                  color="secondary"
+                >
+                  That
+                </Typography>
+              </Typography>
+              <Typography variant="subtitle1">
+                The fun and easy way to make decisions, and help others do the
+                same.
+              </Typography>
+
+              {/* 
+            <Typography variant="body1">
+              Struggling to decide what to do for dinner? Want to know whether
+              to go for a run or swim?
+              <br /> Need help deciding on the better outfit?
+              <br />
+              Want to know whether to go for a run or swim?
+            </Typography> */}
+              <Divider />
+            </Box>
+            <Box>
+              <Fab
+                variant="extended"
+                color={showAdd ? "primary" : "secondary"}
+                onClick={() => setShowAdd(!showAdd)}
+              >
+                {!showAdd ? (
+                  <>
+                    <ExpandMoreIcon className={classes.extendedIcon} />I need
+                    help deciding
+                  </>
+                ) : (
+                  <>
+                    <ExpandLessIcon className={classes.extendedIcon} />I want to
+                    help others decide
+                  </>
+                )}
+              </Fab>
+              {showAdd && <AddThisOrThat setShowAdd={setShowAdd} />}
+            </Box>
+            <Box marginTop={5}>
+              <Typography variant="h3">Help others decide</Typography>
+              {error && <div>Something went wrong ...</div>}
+
+              {loading && (
+                <>
+                  <LoadingSkeleton /> <LoadingSkeleton />
+                </>
+              )}
+              {items && <ThisOrThatList items={items} />}
+            </Box>
           </Box>
         </Container>
       </ThemeProvider>
@@ -248,7 +324,7 @@ const ThisOrThatList = (props: ThisOrThatListProps) => {
   console.log("Rendering this or that list");
   const resultList = props.items.map((item) => (
     <Box key={item.id} marginY={4}>
-      <Typography variant="h4">{item.title}</Typography>
+      <Typography variant="h5">{item.title}</Typography>
       <ThisOrThat thisAndThatPair={item} />
     </Box>
   ));
@@ -274,27 +350,30 @@ type ThisOrThatProps = {
   thisAndThatPair: ThisAndThatPair;
 };
 const ThisOrThat = (props: ThisOrThatProps) => {
-  const classes = useStyles();
   const { thisAndThatPair } = props;
 
   console.log("rendering this or that");
 
   return (
     <>
-      <Grid container>
-        <Grid item xs component={Card} className={classes.card}>
-          <ItemCardContent
-            item={thisAndThatPair.this}
-            id={thisAndThatPair.id}
-            type="this"
-          />
+      <Grid container spacing={4}>
+        <Grid item xs>
+          <Card>
+            <ItemCardContent
+              item={thisAndThatPair.this}
+              id={thisAndThatPair.id}
+              type="this"
+            />
+          </Card>
         </Grid>
-        <Grid item xs component={Card} className={classes.card}>
-          <ItemCardContent
-            item={thisAndThatPair.that}
-            id={thisAndThatPair.id}
-            type="that"
-          />
+        <Grid item xs>
+          <Card>
+            <ItemCardContent
+              item={thisAndThatPair.that}
+              id={thisAndThatPair.id}
+              type="that"
+            />
+          </Card>
         </Grid>
       </Grid>
     </>
@@ -340,14 +419,26 @@ const ItemCardContent = (props: ItemCardContentProps) => {
         </Alert>
       </Snackbar>
 
-      <CardHeader title={props.type === "this" ? "This" : "That"} />
+      <CardHeader
+        title={props.type === "this" ? "This" : "That"}
+        titleTypographyProps={{
+          color: props.type === "this" ? "primary" : "secondary",
+        }}
+      />
       <CardContent>
-        {props.item.value}
+        <Typography variant="body1" align="left">
+          {props.item.value}
+        </Typography>
         {props.item.votes}
       </CardContent>
       <CardActions>
-        <Button size="small" color="primary" onClick={voteForItem}>
-          Vote
+        <Button
+          startIcon={<ThumbUpIcon />}
+          size="medium"
+          color={props.type === "this" ? "primary" : "secondary"}
+          onClick={voteForItem}
+        >
+          {props.type === "this" ? "This " : "That "} is what I would choose
         </Button>
       </CardActions>
     </>
