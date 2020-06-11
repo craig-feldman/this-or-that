@@ -4,12 +4,6 @@ import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
 
-/**
- * This file initialises firebase and exports access to firestore and storage.
- *
- * Note: this has been placed in `firebase-config` package to avoid import conflicts with node modules.
- */
-
 const firebaseConfig = {
   apiKey: "AIzaSyDAIxy6Z7Ah5JbNrHwg37__N1NJ97OC4nk",
   authDomain: "this-or-that-prod.firebaseapp.com",
@@ -24,13 +18,11 @@ const firebaseConfig = {
 // This must run before any other firebase functions
 firebase.initializeApp(firebaseConfig);
 
-// Get a reference to the database service
 const db = firebase.firestore();
-
 const storage = firebase.storage();
-
 const analytics = firebase.analytics();
 
 const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
+const increment = firebase.firestore.FieldValue.increment;
 
-export { db, storage, analytics, serverTimestamp };
+export { db, storage, analytics, serverTimestamp, increment };
