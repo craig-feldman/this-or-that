@@ -1,39 +1,31 @@
-import React, { useState } from "react";
-import "./App.css";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import {
-  Container,
-  Typography,
-  Grid,
+  Box,
+  Button,
   Card,
+  CardActions,
   CardContent,
   CardHeader,
-  CardActions,
-  Button,
+  Container,
+  Divider,
+  Fab,
+  Grid,
   makeStyles,
   Snackbar,
-  Fab,
   TextField,
-  Box,
-  createMuiTheme,
-  ThemeProvider,
-  Divider,
-  Tooltip,
-  Fade,
-  Zoom,
-  useTheme,
-  Paper,
+  Typography,
 } from "@material-ui/core";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import Alert from "@material-ui/lab/Alert";
+import Skeleton from "@material-ui/lab/Skeleton";
+import React, { useState } from "react";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import { useForm } from "react-hook-form";
+import "./App.css";
 import { db, serverTimestamp } from "./firebase";
 import { FirebaseDocument, incrementValue } from "./firebase-utils";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import Alert from "@material-ui/lab/Alert";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-import Skeleton from "@material-ui/lab/Skeleton";
-
-import { useForm } from "react-hook-form";
 
 // items={[
 //   {
@@ -95,31 +87,26 @@ function App() {
 
   return (
     <>
-      <ThemeProvider theme={themeLight}>
-        <CssBaseline />
+      <CssBaseline />
 
-        <Container maxWidth="md">
-          <Box textAlign="center">
-            <Box marginY={4}>
-              <Typography variant="h1">
-                <Typography display="inline" variant="inherit" color="primary">
-                  This
-                </Typography>{" "}
-                or{" "}
-                <Typography
-                  display="inline"
-                  variant="inherit"
-                  color="secondary"
-                >
-                  That
-                </Typography>
+      <Container maxWidth="md">
+        <Box textAlign="center">
+          <Box marginY={4}>
+            <Typography variant="h1">
+              <Typography display="inline" variant="inherit" color="primary">
+                This
+              </Typography>{" "}
+              or{" "}
+              <Typography display="inline" variant="inherit" color="secondary">
+                That
               </Typography>
-              <Typography variant="subtitle1">
-                The fun and easy way to make decisions, and help others do the
-                same.
-              </Typography>
+            </Typography>
+            <Typography variant="subtitle1">
+              The fun and easy way to make decisions, and help others do the
+              same.
+            </Typography>
 
-              {/* 
+            {/* 
             <Typography variant="body1">
               Struggling to decide what to do for dinner? Want to know whether
               to go for a run or swim?
@@ -127,42 +114,41 @@ function App() {
               <br />
               Want to know whether to go for a run or swim?
             </Typography> */}
-              <Divider />
-            </Box>
-            <Box>
-              <Fab
-                variant="extended"
-                color={showAdd ? "primary" : "secondary"}
-                onClick={() => setShowAdd(!showAdd)}
-              >
-                {!showAdd ? (
-                  <>
-                    <ExpandMoreIcon className={classes.extendedIcon} />I need
-                    help deciding
-                  </>
-                ) : (
-                  <>
-                    <ExpandLessIcon className={classes.extendedIcon} />I want to
-                    help others decide
-                  </>
-                )}
-              </Fab>
-              {showAdd && <AddThisOrThat setShowAdd={setShowAdd} />}
-            </Box>
-            <Box marginTop={5}>
-              <Typography variant="h3">Help others decide</Typography>
-              {error && <div>Something went wrong ...</div>}
-
-              {loading && (
+            <Divider />
+          </Box>
+          <Box>
+            <Fab
+              variant="extended"
+              color={showAdd ? "primary" : "secondary"}
+              onClick={() => setShowAdd(!showAdd)}
+            >
+              {!showAdd ? (
                 <>
-                  <LoadingSkeleton /> <LoadingSkeleton />
+                  <ExpandMoreIcon className={classes.extendedIcon} />I need help
+                  deciding
+                </>
+              ) : (
+                <>
+                  <ExpandLessIcon className={classes.extendedIcon} />I want to
+                  help others decide
                 </>
               )}
-              {items && <ThisOrThatList items={items} />}
-            </Box>
+            </Fab>
+            {showAdd && <AddThisOrThat setShowAdd={setShowAdd} />}
           </Box>
-        </Container>
-      </ThemeProvider>
+          <Box marginTop={5}>
+            <Typography variant="h3">Help others decide</Typography>
+            {error && <div>Something went wrong ...</div>}
+
+            {loading && (
+              <>
+                <LoadingSkeleton /> <LoadingSkeleton />
+              </>
+            )}
+            {items && <ThisOrThatList items={items} />}
+          </Box>
+        </Box>
+      </Container>
     </>
   );
 }
@@ -331,15 +317,6 @@ const ThisOrThatList = (props: ThisOrThatListProps) => {
 
   return <Box marginY={4}>{resultList}</Box>;
 };
-
-const useStyles = makeStyles({
-  card: {
-    margin: 16,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
-});
 
 type Item = {
   value: string | JSX.Element;
