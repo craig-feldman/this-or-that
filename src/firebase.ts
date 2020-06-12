@@ -21,8 +21,9 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 const analytics = firebase.analytics();
+const auth = firebase.auth();
 
 const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
 const increment = firebase.firestore.FieldValue.increment;
 
-export { db, storage, analytics, serverTimestamp, increment };
+export { db, storage, analytics, auth, serverTimestamp, increment };

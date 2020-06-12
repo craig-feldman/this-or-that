@@ -9,11 +9,30 @@ import {
 import CssBaseline from "@material-ui/core/CssBaseline";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { AddItemForm } from "./components/AddItemForm";
 import ThisOrThatList from "./components/ThisOrThatList";
+import { auth } from "./firebase";
 
 function App() {
+  const [user, loading, error] = useAuthState(auth);
+  useEffect(() => {
+    const login = async () => {
+      try {
+        await auth.signInAnonymously();
+        console.log("signed in");
+      } catch (error) {
+        console.error("Error creating user:", error);
+      }
+    };
+
+    if (!user && !loading && !error) {
+      login();
+      console.log("Signing in");
+    }
+  }, [error, loading, user]);
+
   return (
     <>
       <CssBaseline />
@@ -45,6 +64,27 @@ function App() {
             </Typography> */}
             <Divider />
           </Box>
+          ABC
+          {loading && (
+            <div>
+              <p>Initialising User...</p>
+            </div>
+          )}
+          {error && (
+            <div>
+              <p>Error: {error}</p>
+            </div>
+          )}
+          {user && (
+            <div>
+              <p>Current User: {user.uid}</p>
+            </div>
+          )}
+          {!user && (
+            <div>
+              <p>NO user</p>
+            </div>
+          )}
           <AddOwn />
           <Box marginTop={5}>
             <Typography variant="h3">Help others decide</Typography>
