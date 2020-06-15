@@ -14,6 +14,10 @@ export type ThisAndThatPair = {
   createdAt: firebase.firestore.FieldValue;
 } & FirebaseDocument;
 
+export type VoteData = {
+  vote: Options;
+} & FirebaseDocument;
+
 export type Options = "this" | "that";
 
 // thisAndThatPairs={[

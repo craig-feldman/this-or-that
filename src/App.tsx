@@ -14,6 +14,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { AddItemForm } from "./components/AddItemForm";
 import ThisOrThatList from "./components/ThisOrThatList";
 import { auth } from "./firebase";
+import UserContext from "./session/UserContext";
 
 function App() {
   const [user, loading, error] = useAuthState(auth);
@@ -23,7 +24,7 @@ function App() {
         await auth.signInAnonymously();
         console.log("signed in");
       } catch (error) {
-        console.error("Error creating user:", error);
+        console.error("Error during sign in:", error);
       }
     };
 
@@ -76,20 +77,24 @@ function App() {
             </div>
           )}
           {user && (
-            <div>
-              <p>Current User: {user.uid}</p>
-            </div>
+            <>
+              <div>
+                <p>Current User: {user.uid}</p>
+              </div>
+              <UserContext.Provider value={user}>
+                <AddOwn />
+                <Box marginTop={5}>
+                  <Typography variant="h3">Help others decide</Typography>
+                  <ThisOrThatList />
+                </Box>
+              </UserContext.Provider>
+            </>
           )}
           {!user && (
             <div>
               <p>NO user</p>
             </div>
           )}
-          <AddOwn />
-          <Box marginTop={5}>
-            <Typography variant="h3">Help others decide</Typography>
-            <ThisOrThatList />
-          </Box>
         </Box>
       </Container>
     </>

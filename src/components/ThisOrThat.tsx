@@ -1,14 +1,15 @@
 import { Grid } from "@material-ui/core";
 import React from "react";
-import { ThisAndThatPair } from "../types";
+import { Options, ThisAndThatPair } from "../types";
 import { ItemCard } from "./ItemCard";
 
 type ThisOrThatProps = {
   thisAndThatPair: ThisAndThatPair;
+  vote: Options | undefined;
 };
 
 const ThisOrThat = (props: ThisOrThatProps) => {
-  const { thisAndThatPair } = props;
+  const { thisAndThatPair, vote } = props;
   console.log("rendering this or that");
 
   return (
@@ -19,6 +20,7 @@ const ThisOrThat = (props: ThisOrThatProps) => {
             item={thisAndThatPair.this}
             id={thisAndThatPair.id}
             type="this"
+            hasVote={vote === "this"}
           />
         </Grid>
         <Grid item xs>
@@ -26,6 +28,7 @@ const ThisOrThat = (props: ThisOrThatProps) => {
             item={thisAndThatPair.that}
             id={thisAndThatPair.id}
             type="that"
+            hasVote={vote === "that"}
           />
         </Grid>
       </Grid>
