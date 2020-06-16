@@ -20,7 +20,7 @@ const ThisOrThat = (props: ThisOrThatProps) => {
             item={thisAndThatPair.this}
             id={thisAndThatPair.id}
             type="this"
-            hasVote={vote === "this"}
+            currentVote={vote}
           />
         </Grid>
         <Grid item xs>
@@ -28,7 +28,7 @@ const ThisOrThat = (props: ThisOrThatProps) => {
             item={thisAndThatPair.that}
             id={thisAndThatPair.id}
             type="that"
-            hasVote={vote === "that"}
+            currentVote={vote}
           />
         </Grid>
       </Grid>

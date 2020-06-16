@@ -1,8 +1,8 @@
 import { Box, Grid, Typography } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { db } from "../firebase";
+import { db, documentId } from "../firebase";
 import UserContext from "../session/UserContext";
 import { ThisAndThatPair, VoteData } from "../types";
 import ThisOrThat from "./ThisOrThat";
@@ -11,23 +11,36 @@ const ThisOrThatList = () => {
   console.log("Rendering this or that list");
   const user = useContext(UserContext);
 
-  // if (!user) {
-  //   return <Typography color="error">Error: No user present</Typography>;
-  // }
-
-  const [items, loading, error] = useCollectionData<ThisAndThatPair>(
+  const [items, loadingItems, errorItems] = useCollectionData<ThisAndThatPair>(
     db.collection("items").orderBy("createdAt", "desc"),
     {
       idField: "id",
     }
   );
 
+  const query = useMemo(() => {
+    if (user && items) {
+      return db.collection(`users/${user.uid}/votes`).where(
+        documentId(),
+        "in",
+        items.map((item) => item.id)
+      );
+    } else {
+      return null;
+    }
+  }, [items, user]);
+
   const [userVotes, loadingVotes, errorVotes] = useCollectionData<VoteData>(
-    db.collection(`users/${user!.uid}/votes`),
+    query,
     {
       idField: "id",
     }
   );
+
+  const loading = useMemo(() => loadingItems || loadingVotes, [
+    loadingItems,
+    loadingVotes,
+  ]);
 
   const findVote = (voteId: string) => {
     return userVotes?.find((item) => item.id === voteId)?.vote;
@@ -38,11 +51,12 @@ const ThisOrThatList = () => {
       {console.log({ items })}
       {console.log({ userVotes })}
 
-      {error && <div>Something went wrong ...</div> && console.error(error)}
+      {errorItems && <div>Something went wrong ...</div> &&
+        console.error(errorItems)}
       {errorVotes && <div>Something went wrong ...</div> &&
         console.error(errorVotes)}
 
-      {(loading || loadingVotes) && (
+      {loading && (
         <>
           <ThisOrThatListLoadingSkeleton />
           <ThisOrThatListLoadingSkeleton />
@@ -55,7 +69,11 @@ const ThisOrThatList = () => {
             <Typography variant="h5" gutterBottom={true}>
               {item.title}
             </Typography>
-            <ThisOrThat thisAndThatPair={item} vote={findVote(item.id)} />
+            <ThisOrThat
+              key={item.id}
+              thisAndThatPair={item}
+              vote={findVote(item.id)}
+            />
           </Box>
         ))}
     </>

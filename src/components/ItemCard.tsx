@@ -18,15 +18,17 @@ type ItemCardContentProps = {
   item: Item;
   id: string;
   type: Options;
-  hasVote: boolean;
+  currentVote?: Options;
 };
 
 export const ItemCard = (props: ItemCardContentProps) => {
-  const { item, id, type, hasVote } = props;
+  const { item, id, type, currentVote } = props;
   const user = useContext(UserContext);
 
   const [showVoteSuccessAlert, setShowVoteSuccessAlert] = useState(false);
   const [showVoteErrorAlert, setShowVoteErrorAlert] = useState(false);
+
+  const hasVote = currentVote === type;
 
   const voteForItem = async () => {
     try {
@@ -36,7 +38,7 @@ export const ItemCard = (props: ItemCardContentProps) => {
         );
       }
       await addVote(id, type, user.uid);
-      await incrementValue("items", id, type);
+      await adjustVoteCount(id, type, currentVote);
       console.log(`Added vote for ${type}-${id}. user: ${user.uid}`);
       setShowVoteSuccessAlert(true);
     } catch (error) {
@@ -113,15 +115,18 @@ const addVote = (itemId: string, thisOrThat: Options, userId: string) => {
   return ref.set({ vote: thisOrThat });
 };
 
-const incrementValue = (
-  collectionPath: string,
+const adjustVoteCount = (
   documentPath: string,
-  thisOrThat: Options
+  thisOrThat: Options,
+  currentVote?: Options
 ) => {
-  const ref = db.collection(collectionPath).doc(documentPath);
-  return thisOrThat === "this"
-    ? ref.update({ "this.votes": increment(1) })
-    : ref.update({ "that.votes": increment(1) });
+  const ref = db.collection("items").doc(documentPath);
+  const updateData = {
+    [`${thisOrThat}.votes`]: increment(1),
+    ...(currentVote && { [`${currentVote}.votes`]: increment(-1) }),
+  };
+
+  return ref.update(updateData);
 };
 
 export default ItemCard;
