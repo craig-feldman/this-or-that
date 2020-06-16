@@ -12,26 +12,20 @@ const ThisOrThatList = () => {
   const user = useContext(UserContext);
 
   const [items, loadingItems, errorItems] = useCollectionData<ThisAndThatPair>(
-    db.collection("items").orderBy("createdAt", "desc"),
+    db.collection("items").orderBy("createdAt", "desc").limit(10),
     {
       idField: "id",
     }
   );
 
-  const query = useMemo(() => {
-    if (user && items) {
-      return db.collection(`users/${user.uid}/votes`).where(
+  const [userVotes, loadingVotes, errorVotes] = useCollectionData<VoteData>(
+    user &&
+      items &&
+      db.collection(`users/${user.uid}/votes`).where(
         documentId(),
         "in",
         items.map((item) => item.id)
-      );
-    } else {
-      return null;
-    }
-  }, [items, user]);
-
-  const [userVotes, loadingVotes, errorVotes] = useCollectionData<VoteData>(
-    query,
+      ),
     {
       idField: "id",
     }
@@ -87,10 +81,10 @@ const ThisOrThatListLoadingSkeleton = () => {
         <Skeleton />
       </Typography>
       <Grid container spacing={4}>
-        <Grid item xs>
+        <Grid item xs={12} sm>
           <Skeleton height={200} variant={"rect"} />
         </Grid>
-        <Grid item xs>
+        <Grid item xs={12} sm>
           <Skeleton height={200} variant={"rect"} />
         </Grid>
       </Grid>

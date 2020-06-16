@@ -76,7 +76,7 @@ export const ItemCard = (props: ItemCardContentProps) => {
         </Alert>
       </Snackbar>
 
-      <Card>
+      <Card style={{ height: "100%" }}>
         <CardHeader
           title={type === "this" ? "This" : "That"}
           titleTypographyProps={{
@@ -84,10 +84,7 @@ export const ItemCard = (props: ItemCardContentProps) => {
           }}
         />
         <CardContent>
-          <Typography variant="body1" align="left">
-            {item.value}
-          </Typography>
-          {item.votes}
+          <Typography variant="body1">{item.value}</Typography>
         </CardContent>
         <CardActions>
           <Button
