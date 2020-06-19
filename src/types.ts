@@ -12,6 +12,7 @@ export type ThisAndThatPair = {
   that: Item;
   title: string;
   createdAt: firebase.firestore.FieldValue;
+  userId: string;
 } & FirebaseDocument;
 
 export type VoteData = {

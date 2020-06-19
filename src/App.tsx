@@ -1,5 +1,6 @@
 import {
   Box,
+  CircularProgress,
   Container,
   Divider,
   Fab,
@@ -54,33 +55,12 @@ function App() {
               The fun and easy way to make decisions, and help others do the
               same.
             </Typography>
-
-            {/* 
-            <Typography variant="body1">
-              Struggling to decide what to do for dinner? Want to know whether
-              to go for a run or swim?
-              <br /> Need help deciding on the better outfit?
-              <br />
-              Want to know whether to go for a run or swim?
-            </Typography> */}
             <Divider />
           </Box>
-          ABC
-          {loading && (
-            <div>
-              <p>Initialising User...</p>
-            </div>
-          )}
-          {error && (
-            <div>
-              <p>Error: {error}</p>
-            </div>
-          )}
+          {loading && <CircularProgress />}
+          {error && <Typography color="error"> Error: {error}</Typography>}
           {user && (
             <>
-              <div>
-                <p>Current User: {user.uid}</p>
-              </div>
               <UserContext.Provider value={user}>
                 <AddOwn />
                 <Box marginTop={5}>
@@ -89,11 +69,6 @@ function App() {
                 </Box>
               </UserContext.Provider>
             </>
-          )}
-          {!user && (
-            <div>
-              <p>NO user</p>
-            </div>
           )}
         </Box>
       </Container>

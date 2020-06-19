@@ -1,4 +1,5 @@
-import { Box, Grid, Typography } from "@material-ui/core";
+import { Box, Chip, Grid, Typography } from "@material-ui/core";
+import FaceIcon from "@material-ui/icons/Face";
 import Skeleton from "@material-ui/lab/Skeleton";
 import React, { useContext, useMemo } from "react";
 import { useCollectionData } from "react-firebase-hooks/firestore";
@@ -61,8 +62,12 @@ const ThisOrThatList = () => {
         items.map((item) => (
           <Box key={item.id} marginY={4}>
             <Typography variant="h5" gutterBottom={true}>
-              {item.title}
+              {item.title}{" "}
+              {user?.uid === item.userId && (
+                <Chip label="yours" icon={<FaceIcon />} size="small" />
+              )}
             </Typography>
+
             <ThisOrThat
               key={item.id}
               thisAndThatPair={item}

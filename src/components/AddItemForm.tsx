@@ -13,9 +13,10 @@ import {
   Typography,
 } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { db, serverTimestamp } from "../firebase";
+import UserContext from "../session/UserContext";
 import { FirebaseDocument, ThisAndThatPair } from "../types";
 
 const useStyles = makeStyles((theme) => ({
@@ -38,6 +39,7 @@ type AddItemFormProps = {
 
 export const AddItemForm = (props: AddItemFormProps) => {
   const classes = useStyles();
+  const user = useContext(UserContext);
 
   const [showSubmitSuccessAlert, setShowSubmitSuccessAlert] = useState(false);
   const [showSubmitErrorAlert, setShowSubmitErrorAlert] = useState(false);
@@ -55,6 +57,7 @@ export const AddItemForm = (props: AddItemFormProps) => {
         that: { votes: 0, value: data.that },
         title: data.title,
         createdAt: serverTimestamp(),
+        userId: user?.uid ?? "",
       };
 
       await db.collection("items").add(newThisAndThatPair);
