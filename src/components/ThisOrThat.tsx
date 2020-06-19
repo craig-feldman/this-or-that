@@ -42,9 +42,10 @@ const ThisOrThat = (props: ThisOrThatProps) => {
   );
 };
 
-const useStyles = makeStyles((theme) => ({
+const useVoteBarStyles = makeStyles((theme) => ({
   root: (props: StylesProps) => ({
     background: `linear-gradient(to right, ${theme.palette.primary.main} ${props.percentage}%, ${theme.palette.secondary.main} ${props.percentage}%)`,
+    opacity: props.hasVotes ? 1 : 0.2,
     height: "10px",
     borderRadius: "5px",
   }),
@@ -52,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
 
 type StylesProps = {
   percentage: number;
+  hasVotes: boolean;
 };
 
 type VoteBarProps = {
@@ -60,11 +62,16 @@ type VoteBarProps = {
 };
 const VoteBar = (props: VoteBarProps) => {
   const { thisVotes, thatVotes } = props;
-  const thisPercentage =
-    thisVotes || thatVotes ? (thisVotes / (thisVotes + thatVotes)) * 100 : 50;
+  const hasVotes = thisVotes > 0 || thatVotes > 0;
+  const thisPercentage = hasVotes
+    ? (thisVotes / (thisVotes + thatVotes)) * 100
+    : 50;
 
-  const styleProps: StylesProps = { percentage: thisPercentage };
-  const classes = useStyles(styleProps);
+  const styleProps: StylesProps = {
+    percentage: thisPercentage,
+    hasVotes: hasVotes,
+  };
+  const classes = useVoteBarStyles(styleProps);
 
   return <Box className={classes.root}></Box>;
 };
