@@ -44,7 +44,9 @@ export const AddItemForm = (props: AddItemFormProps) => {
   const [showSubmitSuccessAlert, setShowSubmitSuccessAlert] = useState(false);
   const [showSubmitErrorAlert, setShowSubmitErrorAlert] = useState(false);
 
-  const { register, handleSubmit, errors, formState } = useForm<FormData>();
+  const { register, handleSubmit, errors, formState } = useForm<FormData>({
+    mode: "onChange",
+  });
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -96,54 +98,71 @@ export const AddItemForm = (props: AddItemFormProps) => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardHeader
               title="Add you own"
-              subheader="Add a 'this or that item' to let the community vote on it!"
+              subheader="Add a 'this or that' item to let the community vote on it!"
             />
             <CardContent>
               <Grid container spacing={4} alignItems="center">
                 <Grid item xs={12}>
                   <TextField
-                    inputRef={register({ required: true })}
+                    inputRef={register({ required: true, maxLength: 60 })}
                     id="add-title"
                     name="title"
                     label="Post title"
                     variant="outlined"
                     fullWidth
+                    multiline
                     inputProps={{ style: { textAlign: "center" } }}
                     error={!!errors.title}
                     helperText={
-                      errors.title && "Please enter a title for the post."
+                      (errors.title?.type === "required" &&
+                        "Please enter a title for your post.") ||
+                      (errors.title?.type === "maxLength" &&
+                        "Your title exceeds the maximum length of 60 characters.")
                     }
+                    placeholder={`Ask a question! Something like, "Should I travel to South Africa or Kenya?"`}
                   />
                 </Grid>
-                <Grid item xs={12} sm={5}>
+                <Grid item xs={12} sm>
                   <TextField
-                    inputRef={register({ required: true })}
+                    inputRef={register({ required: true, maxLength: 140 })}
                     id="add-this"
                     name="this"
                     label="this"
                     variant="outlined"
                     fullWidth
+                    multiline
+                    rows={3}
                     error={!!errors.this}
                     helperText={
-                      errors.this && "Please enter your first option."
+                      (errors.this?.type === "required" &&
+                        "Please describe your first option.") ||
+                      (errors.this?.type === "maxLength" &&
+                        "Your first option exceeds the maximum length of 140 characters")
                     }
+                    placeholder="Describe one of the two options that you are deciding between. (max 140 characters)"
                   />
                 </Grid>
-                <Grid item xs={12} sm={2}>
+                <Grid item xs={12} sm={1}>
                   <Typography variant="h5"> VS </Typography>
                 </Grid>
-                <Grid item xs={12} sm={5}>
+                <Grid item xs={12} sm>
                   <TextField
-                    inputRef={register({ required: true })}
+                    inputRef={register({ required: true, maxLength: 140 })}
                     id="add-that"
                     name="that"
                     label="that"
                     variant="outlined"
                     fullWidth
+                    multiline
+                    rows={3}
                     error={!!errors.that}
                     helperText={
-                      errors.that && "Please enter your second option."
+                      (errors.that?.type === "required" &&
+                        "Please describe your second option.") ||
+                      (errors.that?.type === "maxLength" &&
+                        "Your second option exceeds the maximum length of 140 characters")
                     }
+                    placeholder="Describe the other option. (max 140 characters)"
                   />
                 </Grid>
               </Grid>
