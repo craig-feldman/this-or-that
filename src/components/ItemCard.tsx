@@ -92,6 +92,8 @@ export const ItemCard = (props: ItemCardContentProps) => {
             color={type === "this" ? "primary" : "secondary"}
             onClick={voteForItem}
             disabled={hasVote}
+            variant="outlined"
+            fullWidth={true}
           >
             {type === "this" ? "This " : "That "} is what I{" "}
             {hasVote ? " have chosen" : " would choose"}
