@@ -35,8 +35,11 @@ function App() {
     }
   }, [error, loading, user]);
 
+  let theme = createMuiTheme();
+  theme = responsiveFontSizes(theme);
+
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
 
       <Container maxWidth="md">
@@ -71,8 +74,7 @@ function App() {
             </>
           )}
         </Box>
-      </Container>
-    </>
+    </ThemeProvider>
   );
 }
 
