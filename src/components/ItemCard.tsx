@@ -39,7 +39,6 @@ export const ItemCard = (props: ItemCardContentProps) => {
       }
       await addVote(id, type, user.uid);
       await adjustVoteCount(id, type, currentVote);
-      console.log(`Added vote for ${type}-${id}. user: ${user.uid}`);
       setShowVoteSuccessAlert(true);
     } catch (error) {
       console.error(error);

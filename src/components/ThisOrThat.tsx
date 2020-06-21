@@ -10,7 +10,6 @@ type ThisOrThatProps = {
 
 const ThisOrThat = (props: ThisOrThatProps) => {
   const { thisAndThatPair, vote } = props;
-  console.log("rendering this or that");
 
   return (
     <>

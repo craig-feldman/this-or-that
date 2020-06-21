@@ -1,4 +1,4 @@
-import { Box, Chip, Grid, Typography } from "@material-ui/core";
+import { Box, Chip, Divider, Grid, Typography } from "@material-ui/core";
 import FaceIcon from "@material-ui/icons/Face";
 import Skeleton from "@material-ui/lab/Skeleton";
 import React, { useContext, useMemo } from "react";
@@ -8,12 +8,13 @@ import UserContext from "../session/UserContext";
 import { ThisAndThatPair, VoteData } from "../types";
 import ThisOrThat from "./ThisOrThat";
 
+const MAX_LIST_SIZE = 10;
+
 const ThisOrThatList = () => {
-  console.log("Rendering this or that list");
   const user = useContext(UserContext);
 
   const [items, loadingItems, errorItems] = useCollectionData<ThisAndThatPair>(
-    db.collection("items").orderBy("createdAt", "desc").limit(10),
+    db.collection("items").orderBy("createdAt", "desc").limit(MAX_LIST_SIZE),
     {
       idField: "id",
     }
@@ -43,9 +44,6 @@ const ThisOrThatList = () => {
 
   return (
     <>
-      {console.log({ items })}
-      {console.log({ userVotes })}
-
       {errorItems && <div>Something went wrong ...</div> &&
         console.error(errorItems)}
       {errorVotes && <div>Something went wrong ...</div> &&
@@ -59,21 +57,24 @@ const ThisOrThatList = () => {
       )}
       {items &&
         userVotes &&
-        items.map((item) => (
-          <Box key={item.id} marginY={4}>
-            <Typography variant="h5" gutterBottom={true}>
-              {item.title}{" "}
-              {user?.uid === item.userId && (
-                <Chip label="yours" icon={<FaceIcon />} size="small" />
-              )}
-            </Typography>
+        items.map((item, index) => (
+          <>
+            <Box key={item.id} marginY={4}>
+              <Typography variant="h4" gutterBottom={true}>
+                {item.title}{" "}
+                {user?.uid === item.userId && (
+                  <Chip label="yours" icon={<FaceIcon />} size="small" />
+                )}
+              </Typography>
 
-            <ThisOrThat
-              key={item.id}
-              thisAndThatPair={item}
-              vote={findVote(item.id)}
-            />
-          </Box>
+              <ThisOrThat
+                key={item.id}
+                thisAndThatPair={item}
+                vote={findVote(item.id)}
+              />
+            </Box>
+            {index !== items.length - 1 && <Divider variant="middle" />}
+          </>
         ))}
     </>
   );

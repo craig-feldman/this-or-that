@@ -2,9 +2,12 @@ import {
   Box,
   CircularProgress,
   Container,
+  createMuiTheme,
   Divider,
   Fab,
   makeStyles,
+  responsiveFontSizes,
+  ThemeProvider,
   Typography,
 } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -13,6 +16,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { AddItemForm } from "./components/AddItemForm";
+import Footer from "./components/Footer";
 import ThisOrThatList from "./components/ThisOrThatList";
 import { auth } from "./firebase";
 import UserContext from "./session/UserContext";
@@ -23,7 +27,6 @@ function App() {
     const login = async () => {
       try {
         await auth.signInAnonymously();
-        console.log("signed in");
       } catch (error) {
         console.error("Error during sign in:", error);
       }
@@ -31,7 +34,6 @@ function App() {
 
     if (!user && !loading && !error) {
       login();
-      console.log("Signing in");
     }
   }, [error, loading, user]);
 
@@ -41,39 +43,49 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-
-      <Container maxWidth="md">
-        <Box textAlign="center">
-          <Box marginY={4}>
-            <Typography variant="h1">
-              <Typography display="inline" variant="inherit" color="primary">
-                This
-              </Typography>{" "}
-              or{" "}
-              <Typography display="inline" variant="inherit" color="secondary">
-                That
+      <Box display="flex" flexDirection="column" height="100vh">
+        <Box textAlign="center" flexGrow="1">
+          <Container maxWidth="md">
+            <Box marginY={4}>
+              <Typography variant="h1">
+                <Typography display="inline" variant="inherit" color="primary">
+                  This
+                </Typography>{" "}
+                or{" "}
+                <Typography
+                  display="inline"
+                  variant="inherit"
+                  color="secondary"
+                >
+                  That
+                </Typography>
               </Typography>
-            </Typography>
-            <Typography variant="subtitle1">
-              The fun and easy way to make decisions, and help others do the
-              same.
-            </Typography>
-            <Divider />
-          </Box>
-          {loading && <CircularProgress />}
-          {error && <Typography color="error"> Error: {error}</Typography>}
-          {user && (
-            <>
-              <UserContext.Provider value={user}>
-                <AddOwn />
-                <Box marginTop={5}>
-                  <Typography variant="h3">Help others decide</Typography>
-                  <ThisOrThatList />
-                </Box>
-              </UserContext.Provider>
-            </>
-          )}
+              <Typography variant="subtitle1">
+                The fun and easy way to make decisions, and help others do the
+                same.
+              </Typography>
+              <Divider />
+            </Box>
+            {loading && <CircularProgress />}
+            {error && <Typography color="error"> Error: {error}</Typography>}
+            {user && (
+              <>
+                <UserContext.Provider value={user}>
+                  <AddOwn />
+                  <Box marginTop={5}>
+                    <Typography variant="h3">Help others decide</Typography>
+                    {/* <Typography variant="subtitle1">
+                    Cast your vote for either 'this' or 'that'.
+                  </Typography> */}
+                    <ThisOrThatList />
+                  </Box>
+                </UserContext.Provider>
+              </>
+            )}
+          </Container>
         </Box>
+        <Footer />
+      </Box>
     </ThemeProvider>
   );
 }

@@ -44,10 +44,9 @@ export const AddItemForm = (props: AddItemFormProps) => {
   const [showSubmitSuccessAlert, setShowSubmitSuccessAlert] = useState(false);
   const [showSubmitErrorAlert, setShowSubmitErrorAlert] = useState(false);
 
-  const { register, handleSubmit, errors } = useForm<FormData>();
+  const { register, handleSubmit, errors, formState } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
-    console.log({ data });
     try {
       const newThisAndThatPair: Omit<
         ThisAndThatPair,
@@ -61,6 +60,7 @@ export const AddItemForm = (props: AddItemFormProps) => {
       };
 
       await db.collection("items").add(newThisAndThatPair);
+      props.setShowAdd(false);
       setShowSubmitSuccessAlert(true);
     } catch (error) {
       console.error("An error occurred while submitting the data.", error);
@@ -155,13 +155,19 @@ export const AddItemForm = (props: AddItemFormProps) => {
                 width="100%"
                 className={classes.buttons}
               >
-                <Button type="submit" variant="contained" color="primary">
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={formState.isSubmitting}
+                >
                   Submit
                 </Button>
                 <Button
                   // type="reset"
                   variant="contained"
                   onClick={() => props.setShowAdd(false)}
+                  disabled={formState.isSubmitting}
                 >
                   Cancel
                 </Button>
