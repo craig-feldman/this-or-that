@@ -44,9 +44,13 @@ const ThisOrThatList = () => {
 
   return (
     <>
-      {errorItems && <div>Something went wrong ...</div> &&
+      {errorItems && (
+          <Typography color="error">Something went wrong ...</Typography>
+        ) &&
         console.error(errorItems)}
-      {errorVotes && <div>Something went wrong ...</div> &&
+      {errorVotes && (
+          <Typography color="error">Something went wrong ...</Typography>
+        ) &&
         console.error(errorVotes)}
 
       {loading && (
