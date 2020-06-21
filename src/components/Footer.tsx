@@ -8,7 +8,13 @@ const Footer = () => {
       <Box padding={1}>
         <Typography variant="body2" align="center">
           Site built by{" "}
-          <Link href="https://craigfeldman.com">Craig Feldman</Link>
+          <Link
+            href="https://craigfeldman.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Craig Feldman
+          </Link>
         </Typography>
       </Box>
     </Box>
