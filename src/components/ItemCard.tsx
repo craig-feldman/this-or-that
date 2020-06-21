@@ -4,6 +4,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  makeStyles,
   Snackbar,
   Typography,
 } from "@material-ui/core";
@@ -21,7 +22,26 @@ type ItemCardContentProps = {
   currentVote?: Options;
 };
 
+const useStyles = makeStyles((theme) => ({
+  card: {
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+  },
+  cardActions: {
+    marginTop: "auto",
+  },
+  cardHeader: {
+    padding: theme.spacing(1.5),
+    paddingBottom: theme.spacing(1),
+  },
+  cardContent: {
+    padding: theme.spacing(1.5),
+  },
+}));
+
 export const ItemCard = (props: ItemCardContentProps) => {
+  const classes = useStyles();
   const { item, id, type, currentVote } = props;
   const user = useContext(UserContext);
 
@@ -75,17 +95,18 @@ export const ItemCard = (props: ItemCardContentProps) => {
         </Alert>
       </Snackbar>
 
-      <Card style={{ height: "100%" }}>
+      <Card className={classes.card}>
         <CardHeader
+          className={classes.cardHeader}
           title={type === "this" ? "This" : "That"}
           titleTypographyProps={{
             color: type === "this" ? "primary" : "secondary",
           }}
         />
-        <CardContent>
+        <CardContent className={classes.cardContent}>
           <Typography variant="body1">{item.value}</Typography>
         </CardContent>
-        <CardActions>
+        <CardActions className={classes.cardActions}>
           <Button
             startIcon={<ThumbUpIcon />}
             size="medium"
