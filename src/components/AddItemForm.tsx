@@ -54,9 +54,9 @@ export const AddItemForm = (props: AddItemFormProps) => {
         ThisAndThatPair,
         keyof FirebaseDocument
       > = {
-        this: { votes: 0, value: data.this },
-        that: { votes: 0, value: data.that },
-        title: data.title,
+        this: { votes: 0, value: data.this.trim() },
+        that: { votes: 0, value: data.that.trim() },
+        title: data.title.trim(),
         createdAt: serverTimestamp(),
         userId: user?.uid ?? "",
       };
@@ -105,7 +105,13 @@ export const AddItemForm = (props: AddItemFormProps) => {
               <Grid container spacing={4} alignItems="center">
                 <Grid item xs={12}>
                   <TextField
-                    inputRef={register({ required: true, maxLength: 60 })}
+                    inputRef={register({
+                      required: true,
+                      maxLength: 60,
+                      validate: (value) => {
+                        return !!value.trim();
+                      },
+                    })}
                     id="add-title"
                     name="title"
                     label="Post title"
@@ -115,7 +121,8 @@ export const AddItemForm = (props: AddItemFormProps) => {
                     inputProps={{ style: { textAlign: "center" } }}
                     error={!!errors.title}
                     helperText={
-                      (errors.title?.type === "required" &&
+                      ((errors.title?.type === "required" ||
+                        errors.title?.type === "validate") &&
                         "Please enter a title for your post.") ||
                       (errors.title?.type === "maxLength" &&
                         "Your title exceeds the maximum length of 60 characters.")
@@ -125,7 +132,13 @@ export const AddItemForm = (props: AddItemFormProps) => {
                 </Grid>
                 <Grid item xs={12} sm>
                   <TextField
-                    inputRef={register({ required: true, maxLength: 140 })}
+                    inputRef={register({
+                      required: true,
+                      maxLength: 140,
+                      validate: (value) => {
+                        return !!value.trim();
+                      },
+                    })}
                     id="add-this"
                     name="this"
                     label="this"
@@ -135,7 +148,8 @@ export const AddItemForm = (props: AddItemFormProps) => {
                     rows={3}
                     error={!!errors.this}
                     helperText={
-                      (errors.this?.type === "required" &&
+                      ((errors.this?.type === "required" ||
+                        errors.this?.type === "validate") &&
                         "Please describe your first option.") ||
                       (errors.this?.type === "maxLength" &&
                         "Your first option exceeds the maximum length of 140 characters")
@@ -148,7 +162,13 @@ export const AddItemForm = (props: AddItemFormProps) => {
                 </Grid>
                 <Grid item xs={12} sm>
                   <TextField
-                    inputRef={register({ required: true, maxLength: 140 })}
+                    inputRef={register({
+                      required: true,
+                      maxLength: 140,
+                      validate: (value) => {
+                        return !!value.trim();
+                      },
+                    })}
                     id="add-that"
                     name="that"
                     label="that"
@@ -158,7 +178,8 @@ export const AddItemForm = (props: AddItemFormProps) => {
                     rows={3}
                     error={!!errors.that}
                     helperText={
-                      (errors.that?.type === "required" &&
+                      ((errors.that?.type === "required" ||
+                        errors.that?.type === "validate") &&
                         "Please describe your second option.") ||
                       (errors.that?.type === "maxLength" &&
                         "Your second option exceeds the maximum length of 140 characters")
