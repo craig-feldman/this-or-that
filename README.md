@@ -28,7 +28,7 @@ To vote on an item:
 
 Votes are displayed as a percentage, rather than exact tallies. The vote bar represents 100%, with the blue fill representing the percentage of votes for 'this', and red the percentage for 'that'.
 
-### Tech stack 🥞
+## Tech stack 🥞
 
 This project was build using React (with [material-ui](#https://material-ui.com/) components), TypeScript, and Firebase.
 
