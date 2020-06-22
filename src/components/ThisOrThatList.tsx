@@ -22,13 +22,13 @@ const ThisOrThatList = () => {
   );
 
   const [userVotes, loadingVotes, errorVotes] = useCollectionData<VoteData>(
-    user &&
-      items &&
-      db.collection(`users/${user.uid}/votes`).where(
-        documentId(),
-        "in",
-        items.map((item) => item.id)
-      ),
+    user && items?.length
+      ? db.collection(`users/${user.uid}/votes`).where(
+          documentId(),
+          "in",
+          items.map((item) => item.id)
+        )
+      : null,
     {
       idField: "id",
     }
