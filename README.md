@@ -1,44 +1,35 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# This or That 🤔
 
-## Available Scripts
+> The fun and easy way to make decisions, and help others do the same.
 
-In the project directory, you can run:
+This or That is a simple web app that allows you to ask the community to decide between two options for you.
 
-### `npm start`
+## Why ❓
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+I built this site for fun, experience, and mostly because I wanted to try out realtime updates with Cloud Firestore (see [tech stack](#tech-stack)).
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+## Usage 🧪
 
-### `npm test`
+If you want to add your own item:
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Click the 'I need help deciding' button.
+2. Supply a post title (e.g. "Should I learn guitar or piano?").
+3. Give a succinct and clear summary of one of the two options.
+4. Do the same for your other option.
+5. Click 'submit'.
+6. The page should automatically update to show your item, along with a [vote bar](#vote-bar)
 
-### `npm run build`
+To vote on an item:
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Click the 'this/that is what I would choose' button on the card corresponding to your choice.
+2. The [vote bar](#vote-bar) should update to reflect your vote.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+## Vote bar 🗳️
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Votes are displayed as a percentage, rather than exact tallies. The vote bar represents 100%, with the blue fill representing the percentage of votes for 'this', and red the percentage for 'that'.
 
-### `npm run eject`
+### Tech stack 🥞
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+This project was build using React (with [material-ui](#https://material-ui.com/) components), TypeScript, and Firebase.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+The page is fully responsive, and updates to reflect changes in realtime - votes and new items should display without the need to refresh.
