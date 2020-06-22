@@ -62,6 +62,7 @@ export const AddItemForm = (props: AddItemFormProps) => {
       };
 
       await db.collection("items").add(newThisAndThatPair);
+      // Hide the new item form
       props.setShowAdd(false);
       setShowSubmitSuccessAlert(true);
     } catch (error) {

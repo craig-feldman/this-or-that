@@ -59,6 +59,11 @@ type VoteBarProps = {
   thisVotes: number;
   thatVotes: number;
 };
+/**
+ * Displays a simple bar displaying the vote percentage for 'this' and 'that'.
+ *
+ * If there are no votes yet, the bar opacity is decreased and a 50/50 vote is shown.
+ */
 const VoteBar = (props: VoteBarProps) => {
   const { thisVotes, thatVotes } = props;
   const hasVotes = thisVotes > 0 || thatVotes > 0;

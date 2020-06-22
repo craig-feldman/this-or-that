@@ -18,6 +18,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { AddItemForm } from "./components/AddItemForm";
 import Footer from "./components/Footer";
 import ThisOrThatList from "./components/ThisOrThatList";
+import ThisOrThatTypography from "./components/ThisOrThatTypography";
 import { auth } from "./firebase";
 import UserContext from "./session/UserContext";
 
@@ -48,17 +49,7 @@ function App() {
           <Container maxWidth="md">
             <Box marginY={4}>
               <Typography variant="h1">
-                <Typography display="inline" variant="inherit" color="primary">
-                  This
-                </Typography>{" "}
-                or{" "}
-                <Typography
-                  display="inline"
-                  variant="inherit"
-                  color="secondary"
-                >
-                  That
-                </Typography>
+                <ThisOrThatTypography />
               </Typography>
               <Typography variant="subtitle1">
                 The fun and easy way to make decisions, and help others do the

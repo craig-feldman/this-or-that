@@ -7,8 +7,9 @@ import { db, documentId } from "../firebase";
 import UserContext from "../session/UserContext";
 import { ThisAndThatPair, VoteData } from "../types";
 import ThisOrThat from "./ThisOrThat";
+import ThisOrThatTypography from "./ThisOrThatTypography";
 
-const MAX_LIST_SIZE = 10;
+const MAX_LIST_SIZE = 5;
 
 const ThisOrThatList = () => {
   const user = useContext(UserContext);
@@ -59,27 +60,33 @@ const ThisOrThatList = () => {
           <ThisOrThatListLoadingSkeleton />
         </>
       )}
-      {items &&
-        userVotes &&
-        items.map((item, index) => (
-          <>
-            <Box key={item.id} marginY={4}>
-              <Typography variant="h4" gutterBottom={true}>
-                {item.title}{" "}
-                {user?.uid === item.userId && (
-                  <Chip label="yours" icon={<FaceIcon />} size="small" />
-                )}
-              </Typography>
+      {items && userVotes && (
+        <>
+          {items.map((item, index) => (
+            <>
+              <Box key={item.id} marginY={4}>
+                <Typography variant="h4" gutterBottom={true}>
+                  {item.title}{" "}
+                  {user?.uid === item.userId && (
+                    <Chip label="yours" icon={<FaceIcon />} size="small" />
+                  )}
+                </Typography>
 
-              <ThisOrThat
-                key={item.id}
-                thisAndThatPair={item}
-                vote={findVote(item.id)}
-              />
-            </Box>
-            {index !== items.length - 1 && <Divider variant="middle" />}
-          </>
-        ))}
+                <ThisOrThat
+                  key={item.id}
+                  thisAndThatPair={item}
+                  vote={findVote(item.id)}
+                />
+              </Box>
+              {index !== items.length - 1 && <Divider variant="middle" />}
+            </>
+          ))}
+          <Typography gutterBottom variant="caption">
+            To keep things relevant, we only display a maximum of{" "}
+            {MAX_LIST_SIZE} recent <ThisOrThatTypography /> items.
+          </Typography>
+        </>
+      )}
     </>
   );
 };
@@ -91,11 +98,14 @@ const ThisOrThatListLoadingSkeleton = () => {
         <Skeleton />
       </Typography>
       <Grid container spacing={4}>
-        <Grid item xs={12} sm>
-          <Skeleton height={200} variant={"rect"} />
+        <Grid item xs={12} style={{ paddingBottom: 0 }}>
+          <Skeleton height={10} variant={"rect"} />
         </Grid>
         <Grid item xs={12} sm>
-          <Skeleton height={200} variant={"rect"} />
+          <Skeleton height={150} variant={"rect"} />
+        </Grid>
+        <Grid item xs={12} sm>
+          <Skeleton height={150} variant={"rect"} />
         </Grid>
       </Grid>
     </Box>

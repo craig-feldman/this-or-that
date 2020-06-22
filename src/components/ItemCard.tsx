@@ -57,7 +57,7 @@ export const ItemCard = (props: ItemCardContentProps) => {
           "Error: attempting to cast a vote with no user id present."
         );
       }
-      await addVote(id, type, user.uid);
+      await addVoteForUser(id, type, user.uid);
       await adjustVoteCount(id, type, currentVote);
       setShowVoteSuccessAlert(true);
     } catch (error) {
@@ -125,7 +125,15 @@ export const ItemCard = (props: ItemCardContentProps) => {
   );
 };
 
-const addVote = (itemId: string, thisOrThat: Options, userId: string) => {
+/**
+ * Records the voter for the user's uid.
+ * Note: this does not adjust the actual vote count.
+ * */
+const addVoteForUser = (
+  itemId: string,
+  thisOrThat: Options,
+  userId: string
+) => {
   const ref = db
     .collection("users")
     .doc(userId)
@@ -134,12 +142,21 @@ const addVote = (itemId: string, thisOrThat: Options, userId: string) => {
   return ref.set({ vote: thisOrThat });
 };
 
+/**
+ * Adjust the vote count for the specified item.
+ *
+ * If the user has voted for the other option previously, that vote count is decreased.
+ */
 const adjustVoteCount = (
-  documentPath: string,
+  itemId: string,
   thisOrThat: Options,
   currentVote?: Options
 ) => {
-  const ref = db.collection("items").doc(documentPath);
+  if (thisOrThat === currentVote) {
+    // If user manually enables a button to try double vote
+    return;
+  }
+  const ref = db.collection("items").doc(itemId);
   const updateData = {
     [`${thisOrThat}.votes`]: increment(1),
     ...(currentVote && { [`${currentVote}.votes`]: increment(-1) }),
