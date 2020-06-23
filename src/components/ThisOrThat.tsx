@@ -1,4 +1,4 @@
-import { Box, Grid, makeStyles } from "@material-ui/core";
+import { Box, Grid, makeStyles, Tooltip } from "@material-ui/core";
 import React from "react";
 import { Options, ThisAndThatPair } from "../types";
 import { ItemCard } from "./ItemCard";
@@ -66,6 +66,7 @@ type VoteBarProps = {
  */
 const VoteBar = (props: VoteBarProps) => {
   const { thisVotes, thatVotes } = props;
+
   const hasVotes = thisVotes > 0 || thatVotes > 0;
   const thisPercentage = hasVotes
     ? (thisVotes / (thisVotes + thatVotes)) * 100
@@ -77,7 +78,17 @@ const VoteBar = (props: VoteBarProps) => {
   };
   const classes = useVoteBarStyles(styleProps);
 
-  return <Box className={classes.root}></Box>;
+  const tooltipContent = hasVotes
+    ? `This: ${thisPercentage.toFixed(0)}%; That ${(
+        100 - thisPercentage
+      ).toFixed(0)}%`
+    : "No votes yet!";
+
+  return (
+    <Tooltip title={tooltipContent}>
+      <Box className={classes.root}></Box>
+    </Tooltip>
+  );
 };
 
 export default ThisOrThat;

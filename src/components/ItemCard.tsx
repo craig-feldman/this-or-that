@@ -6,6 +6,7 @@ import {
   CardHeader,
   makeStyles,
   Snackbar,
+  Tooltip,
   Typography,
 } from "@material-ui/core";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
@@ -107,18 +108,20 @@ export const ItemCard = (props: ItemCardContentProps) => {
           <Typography variant="body1">{item.value}</Typography>
         </CardContent>
         <CardActions className={classes.cardActions}>
-          <Button
-            startIcon={<ThumbUpIcon />}
-            size="medium"
-            color={type === "this" ? "primary" : "secondary"}
-            onClick={voteForItem}
-            disabled={hasVote}
-            variant="outlined"
-            fullWidth={true}
-          >
-            {type === "this" ? "This " : "That "} is what I{" "}
-            {hasVote ? " have chosen" : " would choose"}
-          </Button>
+          <Tooltip title={`Vote for ${type}`} aria-label={`vote for ${type}`}>
+            <Button
+              startIcon={<ThumbUpIcon />}
+              size="medium"
+              color={type === "this" ? "primary" : "secondary"}
+              onClick={voteForItem}
+              disabled={hasVote}
+              variant="outlined"
+              fullWidth={true}
+            >
+              {type === "this" ? "This " : "That "} is what I{" "}
+              {hasVote ? " have chosen" : " would choose"}
+            </Button>
+          </Tooltip>
         </CardActions>
       </Card>
     </>
